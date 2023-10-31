@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mathematical Function Animation</title>
+  </head>
+  <body>
+    <canvas id="animationCanvas" ></canvas>
+    <script>
+      canvas.width= 480
+      canvas.height = 480
+      const factor = Math.sqrt(5)/(canvas.width/2)
+      const canvas = document.getElementById("animationCanvas");
+      const ctx = canvas.getContext("2d");
+      ctx.strokeStyle = 'blue'
+      ctx.lineWidth = 2;
+
+      // Define your mathematical function here
+      function mathematicalFunction(x) {
+        return (
+          Math.pow(x, 2 / 3) +
+          0.9 * Math.sqrt(5 - x ** 2) * Math.sin(500 * Math.PI * x)
+        );
+      }
+
+      let animationFrameId;
+      let time = 0;
+      let a = 1;
+
+      // Function to draw the animation
+      function draw() {
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Update the x value for animation
+        time += 0.1; // You can modify this for different animation speeds
+        ctx.beginPath();
+        for (x = 0; x < canvas.width; x++) {
+            // Calculate the y value using your mathematical function
+            const y = canvas.height/2 - mathematicalFunction((x-canvas.width/2)*factor, a)*50;
+            ctx.lineTo(x, y)
+            ctx.stroke()
+        }
+        ctx.closePath();
+
+        // ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        // ctx.fillStyle = "blue";
+        // ctx.fill();
+        a += 0.1
+
+         requestAnimationFrame(draw);
+      }
+
+      // Start the animation
+      draw();
+
+      // Optional: Stop the animation at a certain time
+      // setTimeout(() => cancelAnimationFrame(animationFrameId), 5000); // Stop after 5 seconds
+    </script>
+  </body>
+</html>
