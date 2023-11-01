@@ -1,60 +1,85 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Mathematical Function Animation</title>
+    <title>Math Symphony</title>
   </head>
   <body>
-    <canvas id="animationCanvas" ></canvas>
+    <canvas id="graphCanvas" width="600" height="400"></canvas>
+    <label for="aValue">a Value: <span id="aValue">1</span></label>
     <script>
-      canvas.width= 480
-      canvas.height = 480
-      const factor = Math.sqrt(5)/(canvas.width/2)
-      const canvas = document.getElementById("animationCanvas");
+      const canvas = document.getElementById("graphCanvas");
       const ctx = canvas.getContext("2d");
-      ctx.strokeStyle = 'blue'
-      ctx.lineWidth = 2;
 
-      // Define your mathematical function here
-      function mathematicalFunction(x) {
-        return (
-          Math.pow(x, 2 / 3) +
-          0.9 * Math.sqrt(5 - x ** 2) * Math.sin(500 * Math.PI * x)
-        );
+      const xMin = -3;
+      const xMax = 3;
+      const yMin = -3;
+      const yMax = 3;
+
+      let a = 1; // Initial value of 'a'
+      let targetA = 10; // Target value of 'a'
+      const duration = 5000; // Transition duration in milliseconds (5 seconds)
+      const steps = 100; // Number of steps in the transition
+
+      // Calculate the step size
+      const stepSize = (targetA - a) / steps;
+
+      // Calculate the center of the canvas
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      function toCanvasX(x) {
+        // Adjust transformation based on the center of the canvas
+        return centerX + ((x - xMin) / (xMax - xMin)) * centerX;
       }
 
-      let animationFrameId;
-      let time = 0;
-      let a = 1;
+      function toCanvasY(y) {
+        // Adjust transformation based on the center of the canvas
+        return centerY - ((y - yMin) / (yMax - yMin)) * centerY;
+      }
 
-      // Function to draw the animation
-      function draw() {
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Update the x value for animation
-        time += 0.1; // You can modify this for different animation speeds
-        ctx.beginPath();
-        for (x = 0; x < canvas.width; x++) {
-            // Calculate the y value using your mathematical function
-            const y = canvas.height/2 - mathematicalFunction((x-canvas.width/2)*factor, a)*50;
-            ctx.lineTo(x, y)
-            ctx.stroke()
+      function f(x) {
+        if (x > +0) {
+          return (
+            Math.pow(x, 2 / 3) +
+            0.9 * Math.sqrt(5 - x * x) * Math.sin(a * Math.PI * x)
+          );
+        } else {
+          return (
+            Math.pow(-x, 2 / 3) +
+            0.9 * Math.sqrt(5 - x * x) * Math.sin(a * Math.PI * x)
+          );
         }
-        ctx.closePath();
-
-        // ctx.arc(x, y, 5, 0, 2 * Math.PI);
-        // ctx.fillStyle = "blue";
-        // ctx.fill();
-        a += 0.1
-
-         requestAnimationFrame(draw);
       }
 
-      // Start the animation
-      draw();
+      function drawGraph() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
 
-      // Optional: Stop the animation at a certain time
-      // setTimeout(() => cancelAnimationFrame(animationFrameId), 5000); // Stop after 5 seconds
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(-xMax), toCanvasY(f(-xMax)));
+        for (let x = -xMax; x <= xMax; x += 0.01) {
+          const canvasX = toCanvasX(x);
+          const canvasY = toCanvasY(f(x));
+          ctx.lineTo(canvasX, canvasY);
+        }
+
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      function changeAValue() {
+        a += stepSize;
+        document.getElementById("aValue").textContent = a;
+        drawGraph();
+        if (a >= targetA) {
+          clearInterval(aChangeInterval); // Stop the interval when 'a' reaches the target value
+        }
+      }
+
+      let aChangeInterval = setInterval(changeAValue, duration / steps);
+
+      // Initial drawing
+      drawGraph();
     </script>
   </body>
 </html>
